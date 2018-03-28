@@ -29,7 +29,7 @@ rank_hand(Hand) ->
         TK -> three_of_a_kind;
         TP -> two_pairs;
         PA -> pair;
-        true -> SortHand
+        true -> 'high card' + lists:last(SortHand)
     end.
 
 sort_hand(IntHand) ->
