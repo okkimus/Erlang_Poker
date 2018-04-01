@@ -1,6 +1,6 @@
 -module(poker_game).
 
--export([reset_game/1, swap_card/3]).
+-export([reset_game/1, swap_cards/1]).
 
 reset_game(Players) ->
     Deck = deck:shuffle_deck(),
@@ -19,3 +19,13 @@ swap_card(Hand, Index, Deck) ->
     {Card, Deck_after} = deck:get_card(Deck),
     NewHand = Hand_ ++ [Card],
     {NewHand, Deck_after}.
+
+swap_cards({Hand, Indices, Deck}) -> swap_cards(Hand, Indices, Deck).
+
+swap_cards(Hand, [], Deck) ->
+    {Hand, Deck};
+swap_cards(Hand, Indices, Deck) ->
+    [First | Rest] = Indices,
+    {NewHand, Deck_after} = swap_card(Hand, First, Deck),
+    swap_cards(NewHand, Rest, Deck_after).
+

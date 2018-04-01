@@ -21,15 +21,15 @@ rank_hand(Hand) ->
     TP = is_two_pairs(SortHand),
     PA = is_pair(SortHand),
     if
-        SF -> royal_flush;
-        FK -> four_of_a_kind;
-        FH -> full_house;
-        FL -> flush;
-        ST -> straight;
-        TK -> three_of_a_kind;
-        TP -> two_pairs;
-        PA -> pair;
-        true -> 'high card' + lists:last(SortHand)
+        SF -> {royal_flush, 9};
+        FK -> {four_of_a_kind, 8};
+        FH -> {full_house, 7};
+        FL -> {flush, 6};
+        ST -> {straight, 5};
+        TK -> {three_of_a_kind, 4};
+        TP -> {two_pairs, 3};
+        PA -> {pair, 2};
+        true -> {'high card', 1}
     end.
 
 sort_hand(IntHand) ->
