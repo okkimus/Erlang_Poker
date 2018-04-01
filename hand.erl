@@ -1,35 +1,38 @@
 -module(hand).
 
--export([
-    rank_hand/1,
-    hand_to_integers/1, is_flush/1,
-    is_straight/1, is_straight_flush/1,
-    is_four_a_kind/1, is_full_house/1,
-    is_three_of_a_kind/1, is_two_pairs/1,
-    is_pair/1
-    ]).
+-export([ rank_hand/1, rank_hands/1 ]).
+
+rank_hands(Hands) -> rank_hands(Hands, []).
+
+rank_hands([], Ranked) ->
+    Ranked;
+rank_hands(Hands, Ranked) ->
+    [Hand | Rest] = Hands,
+    Hand_ = rank_hand(Hand),
+    rank_hands(Rest, Ranked ++ [Hand_]).
 
 rank_hand(Hand) ->
     IntHand = hand_to_integers(Hand),
     SortHand = sort_hand(IntHand),
-    SF = is_straight_flush(SortHand),
-    FK = is_four_a_kind(SortHand),
-    FH = is_full_house(SortHand),
-    FL = is_flush(SortHand),
-    ST = is_straight(SortHand),
-    TK = is_three_of_a_kind(SortHand),
-    TP = is_two_pairs(SortHand),
-    PA = is_pair(SortHand),
+    {SFB, SFC} = is_straight_flush(SortHand),
+    {FKB, FKC} = is_four_a_kind(SortHand),
+    {FHB, FHC} = is_full_house(SortHand),
+    {FLB, FLC} = is_flush(SortHand),
+    {STB, STC} = is_straight(SortHand),
+    {TKB, TKC} = is_three_of_a_kind(SortHand),
+    {TPB, TPC} = is_two_pairs(SortHand),
+    {PAB, PAC} = is_pair(SortHand),
+    {_, HighCard} = lists:last(SortHand),
     if
-        SF -> {royal_flush, 9};
-        FK -> {four_of_a_kind, 8};
-        FH -> {full_house, 7};
-        FL -> {flush, 6};
-        ST -> {straight, 5};
-        TK -> {three_of_a_kind, 4};
-        TP -> {two_pairs, 3};
-        PA -> {pair, 2};
-        true -> {'high card', 1}
+        SFB -> {Hand, SFC, royal_flush, 9};
+        FKB -> {Hand, FKC, four_of_a_kind, 8};
+        FHB -> {Hand, FHC, full_house, 7};
+        FLB -> {Hand, FLC, flush, 6};
+        STB -> {Hand, STC, straight, 5};
+        TKB -> {Hand, TKC, three_of_a_kind, 4};
+        TPB -> {Hand, TPC, two_pairs, 3};
+        PAB -> {Hand, PAC, pair, 2};
+        true -> {Hand, HighCard, 'high card', 1}
     end.
 
 sort_hand(IntHand) ->
@@ -56,42 +59,52 @@ value_and_suit_to_integer(Card) ->
     {IntSuit, IntValue}.
         
 is_straight_flush(IntHand) ->
-    is_flush(IntHand) and is_straight(IntHand).
+    {IsFlush, _} = is_flush(IntHand),
+    {IsStraight, Highest} = is_straight(IntHand),
+    if
+        IsFlush and IsStraight ->
+            {true, Highest};
+        true ->
+            {false, Highest}
+    end.
 
 is_four_a_kind(IntHand) ->
     [A,B,C,D,E] = [Value || {_, Value} <- IntHand],
     if
         (A == B) and (B == C) and (C == D) ->
-            true;
+            {true, A};
         (B == C) and (C == D) and (D == E) ->
-            true;
-        true -> false
+            {true, B};
+        true -> {false, A}
     end.
 
 is_full_house(IntHand) ->
     [A,B,C,D,E] = [Value || {_, Value} <- IntHand],
     if
         (A == B) and (B == C) and (D == E) ->
-            true;
+            {true, A};
         (A == B) and (C == D) and (D == E) ->
-            true;
-        true -> false
+            {true, B};
+        true -> {false, B}
     end.
 
 is_flush(IntHand) ->
+    A = hd(IntHand),
     Suits = [Suit || {Suit, _} <- IntHand],
     Flush = case Suits of
-        [1,1,1,1,1] -> true;
-        [2,2,2,2,2] -> true;
-        [3,3,3,3,3] -> true;
-        [4,4,4,4,4] -> true;
-        [_,_,_,_,_] -> false
+        [1,1,1,1,1] -> {true, A};
+        [2,2,2,2,2] -> {true, A};
+        [3,3,3,3,3] -> {true, A};
+        [4,4,4,4,4] -> {true, A};
+        [_,_,_,_,_] -> {false, A}
     end,
     Flush.
 
 is_straight(IntHand) ->
     Values = [Value || {_, Value} <- IntHand],
-    is_straight_values(Values).
+    IsStraight = is_straight_values(Values),
+    Highest = lists:last(IntHand),
+    {IsStraight, Highest}.
 
 is_straight_values(Values) ->
     [Head|Tail] = Values,
@@ -111,38 +124,38 @@ is_three_of_a_kind(IntHand) ->
     [A,B,C,D,E] = [Value || {_, Value} <- IntHand],
     if
         (A == B) and (B == C) ->
-            true;
+            {true, A};
         (B == C) and (C == D) ->
-            true;
+            {true, B};
         (C == D) and (D == E) ->
-            true;
-        true -> false
+            {true, C};
+        true -> {false, A}
     end.
     
 is_two_pairs(IntHand) ->
     [A,B,C,D,E] = [Value || {_, Value} <- IntHand],
     if
         (A == B) and (C == D) ->
-            true;
+            {true, D};
         (A == B) and (D == E) ->
-            true;
+            {true, E};
         (B == C) and (D == E) ->
-            true;
-        true -> false
+            {true, E};
+        true -> {false, A}
     end.
 
 is_pair(IntHand) ->
     [A,B,C,D,E] = [Value || {_, Value} <- IntHand],
     if
         (A == B) ->
-            true;
+            {true, A};
         (B == C) ->
-            true;
+            {true, B};
         (C == D) ->
-            true;
+            {true, C};
         (D == E) ->
-            true;
-        true -> false
+            {true, D};
+        true -> {false, A}
     end.
 
 % % High card can be checked by looking at last card
