@@ -21,7 +21,7 @@ shuffle_deck() ->
 
 create_deck() -> 
     Suits = [hearts, diamonds, clubs, spades],
-    Values = [ace, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, jack, queen, king],
+    Values = [ace, 2, 3, 4, 5, 6, 7, 8, 9, 10, jack, queen, king],
     Cards = [{S, V} || S <- Suits, V <- Values],
     Cards.
 

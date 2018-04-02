@@ -5,14 +5,14 @@
 winning_hand(Hands) ->
     Best_hands = best_ranks(Hands),
     Best_hand = best_of_the_best(Best_hands),
-    int_to_value(Best_hand).
+    int_to_value(lists:sort(Best_hand)).
 
 best_of_the_best(Best_hands) ->
     lists:last(lists:keysort(2, Best_hands)).
 
 best_ranks(Hands) ->
     RankedHands = hand:rank_hands(Hands),
-    SortedRankedHands = lists:keysort(3, RankedHands),
+    SortedRankedHands = lists:keysort(4, RankedHands),
     {_, _, _, HighestRankNumber} = lists:last(SortedRankedHands),
     lists:filter(fun(A) -> is_rank(A, HighestRankNumber) end, SortedRankedHands).
 
