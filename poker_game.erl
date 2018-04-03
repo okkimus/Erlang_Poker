@@ -8,7 +8,8 @@ start() ->
     Players = element(2, Input),
     {Hands, Deck} = reset_game(Players),
     {HandsAfter, _} = loop_hands({Hands, Deck}),
-    ranker:winning_hand(HandsAfter).
+    {WinnerHand, HighCard, Rank} = ranker:winning_hand(HandsAfter),
+    io:format("Winning hand ~p", [Rank]).
 
 loop_hands({Hands, Deck}) -> loop_hands(Hands, [], Deck).
 
