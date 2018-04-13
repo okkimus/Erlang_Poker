@@ -1,6 +1,3 @@
--created('Date: 3.4.2018').
--created_by('okkimus').
-
 %%% Deck module takes care of creating deck, dealing hands and cards.
 -module(deck).
 
