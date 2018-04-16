@@ -1,7 +1,7 @@
 %%% Deck module takes care of creating deck, dealing hands and cards.
 -module(deck).
 
--export([get_hand/1, get_cards/2, shuffle_deck/0]).
+-export([get_hand/1, get_cards/2, get_card/1, shuffle_deck/0]).
 
 %%----------------------------------------------------------------------
 %% Function: get_hand/1
@@ -33,7 +33,7 @@ get_card(Deck) ->
 %% Returns: Tuple with deck after dealing the cards and the drawn cards.
 %%----------------------------------------------------------------------
 get_cards(Count, Deck) ->
-    {Deck_after, Cards} = loop_cards({Count, Deck, []}),
+    {Deck_after, Cards} = loop_cards({Count, Deck}),
     {Deck_after, Cards}.
 
 %%----------------------------------------------------------------------

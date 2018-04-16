@@ -14,7 +14,7 @@
 winning_hand(Hands) ->
     Best_hands = best_ranks(Hands),
     Best_hand = best_of_the_best(Best_hands),
-    int_to_value(lists:sort(Best_hand)).
+    int_to_value(Best_hand).
 
 %%----------------------------------------------------------------------
 %% Function: best_of_the_best/1
